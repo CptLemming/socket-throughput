@@ -1,44 +1,49 @@
 use std::time::{Instant, Duration};
 use actix::{
-  io::SinkWrite, Actor, ActorContext, Addr, AsyncContext, Context, Handler, Message,
-  StreamHandler, Running, WrapFuture, ActorFutureExt,
+  io::SinkWrite, Actor, ActorContext, AsyncContext, Context, Handler, Message,
+  StreamHandler, WrapFuture, ActorFutureExt,
 };
 use actix::prelude::*;
-use actix_codec::Framed;
 use actix_web::{HttpServer, App};
-use awc::ClientResponse;
 use futures::TryStreamExt;
-use futures::{stream::{SplitSink, SplitStream}, SinkExt};
 use futures_util::stream::StreamExt;
+use clap::{Parser, ValueEnum};
 
-use awc::{error::WsProtocolError, ws, BoxedSocket, Client};
+use awc::{error::WsProtocolError, ws, Client};
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+  #[arg(value_enum)]
+  mode: Mode,
+
+  #[arg(short, long, default_value_t = 10)]
+  times: u32,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Mode {
+    HTTP,
+    WS,
+    Stream,
+}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-  let times = 1_000_000;
+  let cli = Cli::parse();
+  println!("{:?}", cli);
 
-  // HttpClient{ times, start: None, results: vec![] }.start();
-  WebSocketClient{ times, replies: 0, start: None }.start();
-
-  // let client = Client::new();
-  // let mut res = client
-  //     .get(format!("http://localhost:3000/stream?times={}", times))
-  //     .send()
-  //     .await
-  //     .unwrap();
-
-  // let start = Instant::now();
-  // let mut s = res.into_stream();
-
-  // while let Some(value) = s.next().await {
-  //   // println!("Buffer:: {:?}", value);
-  // }
-  // let end = Instant::elapsed(&start);
-  // println!("Avg :: 0.{}ms", end.as_micros() / (times as u128));
-  // println!("Avg :: {}ns", end.as_nanos() / (times as u128));
-  // println!("Total :: 0.{}ms", end.as_micros());
-  // println!("Total :: {}ms", end.as_millis());
-  // println!("Total :: {}ns", end.as_nanos());
+  match cli.mode {
+    Mode::HTTP => {
+      HttpClient{ times: cli.times, start: None, results: vec![] }.start();
+    }
+    Mode::WS => {
+      WebSocketClient{ times: cli.times, replies: 0, start: None }.start();
+    }
+    Mode::Stream => {
+      perform_stream_test(cli.times).await;
+    }
+  }
 
   // Start an async process to stop script ending
   HttpServer::new(|| {
@@ -53,7 +58,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 pub struct HttpClient {
-  times: i32,
+  times: u32,
   start: Option<Instant>,
   results: Vec<u128>,
 }
@@ -149,9 +154,9 @@ impl Handler<HttpClientComplete> for HttpClient {
 }
 
 pub struct WebSocketClient {
-  times: i32,
+  times: u32,
   start: Option<Instant>,
-  replies: i32,
+  replies: u32,
 }
 
 impl Actor for WebSocketClient {
@@ -199,4 +204,26 @@ impl StreamHandler<Result<ws::Frame, WsProtocolError>> for WebSocketClient {
       }
     }
   }
+}
+
+async fn perform_stream_test(times: u32) {
+  let client = Client::new();
+  let mut res = client
+      .get(format!("http://localhost:3000/stream?times={}", times))
+      .send()
+      .await
+      .unwrap();
+
+  let start = Instant::now();
+  let mut s = res.into_stream();
+
+  while let Some(value) = s.next().await {
+    // println!("Buffer:: {:?}", value);
+  }
+  let end = Instant::elapsed(&start);
+  println!("Avg :: 0.{}ms", end.as_micros() / (times as u128));
+  println!("Avg :: {}ns", end.as_nanos() / (times as u128));
+  println!("Total :: 0.{}ms", end.as_micros());
+  println!("Total :: {}ms", end.as_millis());
+  println!("Total :: {}ns", end.as_nanos());
 }
