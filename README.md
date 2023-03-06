@@ -2,21 +2,68 @@
 
 Repo to compare relative throughput performance of HTTP requests, WebSocket messages & HTTP streaming.
 
-| Lang | Library | Protocol | Requests | Avg | Total time |
-| -- | -- | -- | -- | -- | -- |
-| Rust | Actix | HTTP      | 1,000     | 0.104ms  | 113ms    |
-| Rust | Actix | WebSocket | 1,000     | -        | 0.12ms   |
-| Rust | Actix | Streaming | 1,000     | -        | 0.59ms   |
-| Rust | Actix | HTTP      | 10,000    | -        | 676ms    |
-| Rust | Actix | WebSocket | 10,000    | -        | 6ms      |
-| Rust | Actix | Streaming | 10,000    | -        | 5ms      |
-| Rust | Actix | WebSocket | 1,000,000 | -        | 489ms    |
-| Rust | Actix | Streaming | 1,000,000 | -        | 412ms    |
-| Java | Akka  | HTTP      | 1,000     | 0.395ms  | 410ms    |
-| Java | Akka  | WebSocket | 1,000     | -        | 13ms     |
-| Java | Akka  | Streaming | 1,000     | -        | 7ms      |
-| Java | Akka  | HTTP      | 10,000    | -        | 3,029ms  |
-| Java | Akka  | WebSocket | 10,000    | -        | 50ms     |
-| Java | Akka  | Streaming | 10,000    | -        | 24ms     |
-| Java | Akka  | WebSocket | 1,000,000 | -        | 3,354ms  |
-| Java | Akka  | Streaming | 1,000,000 | -        | 2,191ms  |
+## HTTP @ 1,000
+
+| Lang | Library | Avg | Total time |
+| -- | -- | -- | -- |
+| Rust | Actix         | 0.104ms  | 113ms    |
+| Java | Akka          | 0.395ms  | 410ms    |
+| Java | Spring(tomcat)| 0.202ms  | 216ms    |
+| Java | Spring(netty) | 0.296ms  | 307ms    |
+
+## HTTP @ 10,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix         | 676ms    |
+| Java | Akka          | 3,029ms  |
+| Java | Spring(tomcat)| 928ms    |
+| Java | Spring(netty) | 1,591ms  |
+
+## WebSocket @ 1,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 0.12ms   |
+| Java | Akka           | 13ms     |
+| Java | Spring(tomcat) | 8ms      |
+
+## WebSocket @ 10,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 6ms      |
+| Java | Akka           | 50ms     |
+| Java | Spring(tomcat) | 39ms     |
+
+## WebSocket @ 1,000,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 489ms    |
+| Java | Akka           | 3,354ms  |
+| Java | Spring(tomcat) | 3,315ms  |
+
+## Streaming @ 1,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 0.59ms   |
+| Java | Akka           | 7ms      |
+| Java | Spring(tomcat) | 6ms      |
+
+## Streaming @ 10,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 5ms      |
+| Java | Akka           | 24ms     |
+| Java | Spring(tomcat) | 49ms     |
+
+## Streaming @ 1,000,000
+
+| Lang | Library | Total time |
+| -- | -- | -- |
+| Rust | Actix          | 412ms    |
+| Java | Akka           | 2,191ms  |
+| Java | Spring(tomcat) | 3,829ms  |
