@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class SocketHandler extends TextWebSocketHandler {
-	
+
 	List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
   private static final ObjectMapper defaultObjectMapper = new ObjectMapper().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
 
