@@ -73,5 +73,5 @@ Repo to compare relative throughput performance of HTTP requests, WebSocket mess
 | Lang | Library | Total time |
 | -- | -- | -- |
 | Rust | Tokio          | 2.2ms |
-| Java | Akka           | -     |
+| Java | Akka           | 2.8ms |
 | Java | Spring(tomcat) | -     |

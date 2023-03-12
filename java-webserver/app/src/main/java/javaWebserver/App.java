@@ -48,7 +48,11 @@ public class App extends AllDirectives {
   }
 
   public static void main(String[] args) {
-    ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "root");
+    ActorSystem<Void> system = ActorSystem.create(Behaviors.setup(context -> {
+      context.spawn(TcpApp.create(), "tcp-app");
+
+      return Behaviors.empty();
+    }), "root");
 
     App app = new App(system);
 

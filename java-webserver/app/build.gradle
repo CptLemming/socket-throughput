@@ -33,6 +33,7 @@ dependencies {
     implementation 'com.lightbend.akka:akka-stream-alpakka-udp_2.13:3.0.2'
     implementation 'com.lightbend.akka:akka-stream-alpakka-file_2.13:3.0.2'
     implementation 'com.lightbend.akka.management:akka-management_2.13:1.1.1'
+    implementation 'io.netty:netty-buffer:4.1.60.Final'
     implementation 'ch.qos.logback:logback-classic:1.1.7'
 }
 

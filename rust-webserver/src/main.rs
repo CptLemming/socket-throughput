@@ -1,7 +1,9 @@
 use std::fmt::Display;
+use std::io::Write;
 
 use actix_web::rt::net::{TcpListener, TcpStream};
 use actix_web::rt::signal;
+use actix_web::web::BufMut;
 use deku::prelude::*;
 use actix::{Actor, StreamHandler};
 use actix_web::{get, post, web, Result, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
@@ -138,7 +140,7 @@ fn make_stream_item() -> Result<web::Bytes, Error> {
 fn make_uuid() -> String {
   thread_rng()
         .sample_iter(&Alphanumeric)
-        .take(24)
+        .take(36)
         .map(char::from)
         .collect()
 }
@@ -230,12 +232,22 @@ async fn process_socket(mut socket: TcpStream) {
 
         let (_remaining, req) = SocketRequest::from_bytes((buf.as_ref(), 0)).unwrap();
         println!("Send response {} times", req.times);
+        let mut out_buf = vec![];
+        let mut out_buf_writer = out_buf.writer();
 
         for _ in 0..req.times {
           let uuid = make_uuid();
           let res = SocketResponse{ name: AdvString { str_len: uuid.len() as i32, str_bytes: uuid.into_bytes() } };
-          socket.write(&res.to_bytes().unwrap()).await.unwrap();
+          out_buf_writer.write(&res.to_bytes().unwrap()).unwrap();
         }
+
+        socket.write(&out_buf_writer.into_inner()).await.unwrap();
+
+        // for _ in 0..req.times {
+        //   let uuid = make_uuid();
+        //   let res = SocketResponse{ name: AdvString { str_len: uuid.len() as i32, str_bytes: uuid.into_bytes() } };
+        //   socket.write(&res.to_bytes().unwrap()).await.unwrap();
+        // }
       }
       Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
         continue;

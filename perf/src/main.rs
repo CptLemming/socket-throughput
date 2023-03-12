@@ -290,6 +290,8 @@ async fn perform_socket_test(times: u32) {
     let mut replies = 0;
     let mut socket = TcpStream::connect("localhost:3001").await.unwrap();
 
+    tokio::time::sleep(Duration::from_millis(2000)).await;
+
     let req = SocketRequest{ times };
     let data: Vec<u8> = req.to_bytes().unwrap();
     let mut end: Option<Duration> = None;
@@ -307,12 +309,13 @@ async fn perform_socket_test(times: u32) {
           break;
         }
         Ok(size) => {
-          // log::info!("reading from stream {}", size);
+          log::info!("reading from stream {}", size);
+          // log::info!("stream -> {:?}", buf);
 
           let mut buffer_len = size;
           loop {
             // log::info!("reading");
-            let message_size = 24 + 4;
+            let message_size = 36 + 4;
             // let (remaining, res) = SocketResponse::from_bytes((buf.as_ref(), 0)).unwrap();
             replies += 1;
 
